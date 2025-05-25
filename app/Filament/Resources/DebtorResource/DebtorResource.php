@@ -23,6 +23,8 @@ class DebtorResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $label = 'Qarzdorlar';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -149,8 +151,15 @@ class DebtorResource extends Resource
 
                         $record->decrement('amount', $data['amount']); // qarz kamayadi
                     }),
+                Action::make('view_pdf')
+                    ->label('PDF')
+                    ->icon('heroicon-o-document')
+                    ->url(fn ($record) => route('debtor.check.pdf', $record))
+                    ->openUrlInNewTab()
+                    ->color('gray'),
 
                 Tables\Actions\EditAction::make(),
+
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

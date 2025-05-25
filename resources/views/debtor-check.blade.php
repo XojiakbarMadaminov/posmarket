@@ -3,48 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <style>
-        @page {
-            margin: 0;
-        }
+        @page { margin: 0; }
 
         body {
             font-family: monospace;
-            font-size: 12px;
+            font-size: 10px;
+            width: 136pt; /* 48mm */
             margin: 0;
-            padding: 10px;
-            width: 226.79pt; /* 80mm */
+            padding: 6px;
         }
 
-        .line {
-            margin-bottom: 6px;
+        .line { margin: 2px 0; }
+        .center { text-align: center; margin: 3px 0; }
+        .divider { border-top: 1px dashed black; margin: 4px 0; }
+
+        img.logo {
+            width: 70px;
+            height: auto;
+            margin: 2px auto;
+            display: block;
         }
 
-        .center {
+        .mini {
+            font-size: 6px;
             text-align: center;
-            margin: 12px 0;
-        }
-
-        .divider {
-            border-top: 1px dashed black;
-            margin: 12px 0;
         }
     </style>
 </head>
 <body>
+
+<div class="center">
+    <img src="{{ public_path('images/million-50 (1).png') }}" class="logo">
+</div>
+
 <div class="center">*** QARZDORLIK CHEKI ***</div>
 
-<div class="line">Sana:      {{ now()->format('Y-m-d') }}</div>
-<div class="line">Ism:       {{ $debtor->full_name }}</div>
-<div class="line">Tel:       {{ $debtor->phone }}</div>
-<div class="line">Valyuta:   {{ strtoupper($debtor->currency) }}</div>
-<div class="line">Qarz:      {{ number_format($debtor->amount, 0, '.', ' ') }}</div>
+<div class="line">Do`kon: {{ config('app.store_name') }}</div>
+<div class="line">Sana:   {{ now()->format('d.m.Y') }}</div>
+<div class="line">Ism:    {{ $debtor->full_name }}</div>
+<div class="line">Tel:    {{ $debtor->phone }}</div>
+<div class="line">Valyuta: {{ strtoupper($debtor->currency) }}</div>
+<div class="line">Joriy:  {{ number_format($debtor->amount, 0, '.', ' ') }}</div>
 
 @if ($debtor->note)
-    <div class="line">Izoh:</div>
-    <div class="line">{{ $debtor->note }}</div>
+    <div class="line">Izoh: {{ $debtor->note }}</div>
+@endif
+
+@if ($debtor->transactions->isNotEmpty())
+    <div class="divider"></div>
+    <div class="line"><strong>Tranzaksiyalar:</strong></div>
+    @foreach ($debtor->transactions as $tx)
+        <div class="line">
+            [{{ \Carbon\Carbon::parse($tx->date)->format('d.m.Y') }}]
+            {{ $tx->type === 'debt' ? '-' : '+' }}
+            {{ number_format($tx->amount, 0, '.', ' ') }}
+        </div>
+    @endforeach
 @endif
 
 <div class="divider"></div>
-<div class="center">POSMARKET DASTURI ORQALI YARATILDI</div>
+
+<div class="center">
+    <img src="{{ public_path('images/qr.png') }}" class="logo">
+</div>
+
+<div class="divider"></div>
+
+<div class="center mini">Powered by @developer_2202</div>
+
 </body>
 </html>

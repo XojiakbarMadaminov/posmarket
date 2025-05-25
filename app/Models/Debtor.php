@@ -11,6 +11,6 @@ class Debtor extends Model
 
     public function transactions()
     {
-        return $this->hasMany(DebtorTransaction::class);
+        return $this->hasMany(DebtorTransaction::class)->orderBy('date');
     }
 }

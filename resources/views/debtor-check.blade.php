@@ -10,7 +10,7 @@
             font-size: 10px;
             width: 136pt; /* 48mm */
             margin: 0;
-            padding: 6px;
+            padding: 10px;
         }
 
         .line { margin: 2px 0; }

@@ -2,9 +2,18 @@
     {{-- Qidiruv --}}
     <div class="space-y-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:space-y-0">
         <div>
+{{--            <x-filament::input--}}
+{{--                x-data--}}
+{{--                x-on:keydown.enter="$wire.addByBarcode($event.target.value); $event.target.value='';"--}}
+{{--                placeholder="Skanerlash yoki qo‘lda kiriting..."--}}
+{{--                autofocus--}}
+{{--            />--}}
+
             <x-filament::input
                 x-data
-                x-on:keydown.enter="$wire.addByBarcode($event.target.value); $event.target.value='';"
+                x-ref="searchInput"
+                x-init="$nextTick(() => $refs.searchInput.focus())"
+                x-on:keydown.enter="$wire.addByBarcode($event.target.value); $event.target.value=''; $nextTick(() => $refs.searchInput.focus())"
                 placeholder="Skanerlash yoki qo‘lda kiriting..."
             />
 

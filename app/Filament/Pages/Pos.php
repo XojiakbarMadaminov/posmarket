@@ -72,7 +72,10 @@ class Pos extends Page
         $totals      = $cartService->totals();
 
         if (!$totals['qty']) {
-            $this->notify('warning', 'Savat bo‘sh!');
+            Notification::make()
+                ->title('Savat bo`sh')
+                ->warning()
+                ->send();
             return;
         }
 
@@ -95,7 +98,10 @@ class Pos extends Page
         $this->reset('search');
         $this->products = new EloquentCollection();
         $this->refreshCart();
-        $this->notify('success', 'Sotuv saqlandi!');
+        Notification::make()
+            ->title('Sotuv yopildi')
+            ->success()
+            ->send();
     }
 
     /* ---------- Helper ---------- */
@@ -118,7 +124,10 @@ class Pos extends Page
             $this->add($product->id);
             $this->reset('search');
         } else {
-            $this->notify('danger', 'Mahsulot topilmadi');
+            Notification::make()
+                ->title('Mahsulot topilmadi')
+                ->danger()
+                ->send();
         }
     }
 

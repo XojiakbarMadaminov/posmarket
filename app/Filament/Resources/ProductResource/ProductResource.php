@@ -17,8 +17,14 @@ use Milon\Barcode\DNS1D;
 class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
+    protected static ?int $navigationSort = 3;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    public static function getLabel(): ?string
+    {
+        return "Tovarlar";
+    }
 
     public static function form(Form $form): Form
     {
@@ -53,6 +59,7 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('barcode')->label('Bar kod')
                 ->searchable(),
                 Tables\Columns\TextColumn::make('price')->label('Narxi'),
+                Tables\Columns\TextColumn::make('initial_price')->label('Kelgan narxi'),
                 ViewColumn::make('barcode_image')
                     ->label('Bar kod')
                     ->view('filament.components.barcode'),

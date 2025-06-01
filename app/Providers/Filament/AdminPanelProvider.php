@@ -51,6 +51,8 @@ class AdminPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ])
+            ->topNavigation()
+            ->brandName('Million Parfume')
             ->authMiddleware([
                 Authenticate::class,
             ]);

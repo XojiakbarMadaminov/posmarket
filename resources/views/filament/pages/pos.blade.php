@@ -1,8 +1,7 @@
-<x-filament::page>
+<x-filament::page class="bg-gray-100 dark:bg-gray-950">
     {{-- Auto-focus script --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Sahifa yuklanganda
             setTimeout(() => {
                 const input = document.querySelector('input[placeholder*="Skanerlash"]');
                 if (input) {
@@ -11,7 +10,6 @@
             }, 200);
         });
 
-        // Livewire komponentlar yangilanganda
         document.addEventListener('livewire:navigated', function() {
             setTimeout(() => {
                 const input = document.querySelector('input[placeholder*="Skanerlash"]');
@@ -22,79 +20,91 @@
         });
     </script>
 
-    {{-- Cart Tabs - Ko'p savat tugmalari --}}
-    <div class="mb-6">
-        <div class="flex items-center gap-2 mb-4">
-            <h3 class="font-semibold">Faol savatlar:</h3>
-            <x-filament::button wire:click="createNewCart" size="sm" color="success">
-                + Yangi savat
+    {{-- Cart Management Section --}}
+    <x-filament::card class="mb-6">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4">
+            <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-3 sm:mb-0">Faol savatlar</h3>
+            <x-filament::button wire:click="createNewCart" size="md" color="success" icon="heroicon-o-plus-circle">
+                Yangi savat
             </x-filament::button>
         </div>
 
-        <div class="flex flex-wrap gap-2">
-            @foreach($activeCarts as $cartId => $cartTotals)
-                <div class="relative">
-                    <x-filament::button
-                        wire:click="switchCart({{ $cartId }})"
-                        size="sm"
-                        :color="$activeCartId === $cartId ? 'primary' : 'gray'"
-                        class="relative pr-8"
-                    >
-                        Savat #{{ $cartId }}
-                        @if($cartTotals['qty'] > 0)
-                            <span class="ml-1 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">
-                                {{ $cartTotals['qty'] }}
-                            </span>
-                        @endif
-                    </x-filament::button>
-
-                    @if(count($activeCarts) > 1)
-                        <button
-                            wire:click="closeCart({{ $cartId }})"
-                            class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs hover:bg-red-600"
-                            title="Savatni yopish"
+        @if(count($activeCarts) > 0)
+            <div class="flex flex-wrap gap-2 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+                @foreach($activeCarts as $cartId => $cartTotals)
+                    <div class="relative group">
+                        <x-filament::button
+                            wire:click="switchCart({{ $cartId }})"
+                            size="sm"
+                            :color="$activeCartId === $cartId ? 'primary' : 'gray'"
+                            :outlined="$activeCartId !== $cartId"
+                            class="relative {{ count($activeCarts) > 1 ? 'pr-10' : '' }}"
+                            tag="button"
                         >
-                            ×
-                        </button>
-                    @endif
-                </div>
-            @endforeach
-        </div>
+                            Savat #{{ $cartId }}
+                            @if($cartTotals['qty'] > 0)
+                                <span class="ml-1.5 bg-danger-500 text-white text-xs rounded-full px-1.5 py-0.5 font-medium">
+                                    {{ $cartTotals['qty'] }}
+                                </span>
+                            @endif
+                        </x-filament::button>
 
-        <div class="mt-2 text-sm text-gray-600">
-            Joriy savat: <strong>#{{ $activeCartId }}</strong>
-            @if($totals['qty'] > 0)
-                - {{ $totals['qty'] }} dona, {{ number_format($totals['amount'], 2, '.', ' ') }} so'm
+                        @if(count($activeCarts) > 1)
+                            <button
+                                wire:click="closeCart({{ $cartId }})"
+                                class="absolute -top-2 -right-2 bg-danger-500 text-white rounded-full w-6 h-6 text-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-150 ease-in-out hover:bg-danger-600 z-10"
+                                title="Savatni yopish"
+                                wire:confirm="Savat #{{ $cartId }} ni yopishni tasdiqlaysizmi?"
+                            >
+                                <x-heroicon-o-x-mark class="w-4 h-4"/>
+                            </button>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+        @endif
+
+        <div class="text-sm text-gray-600 dark:text-gray-400">
+            Joriy savat: <strong class="text-gray-900 dark:text-white">#{{ $activeCartId }}</strong>
+            @if(isset($totals['qty']) && $totals['qty'] > 0)
+                <span class="mx-1 text-gray-400 dark:text-gray-600">|</span>
+                {{ $totals['qty'] }} mahsulot,
+                <span class="font-semibold text-gray-800 dark:text-gray-200">{{ number_format($totals['amount'], 0, '.', ' ') }} so'm</span>
+            @else
+                <span class="mx-1 text-gray-400 dark:text-gray-600">|</span> Savat bo'sh
             @endif
         </div>
-    </div>
+    </x-filament::card>
 
     {{-- Asosiy content --}}
     <div class="space-y-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:space-y-0">
         <div>
             {{-- Qidiruv input --}}
-            <x-filament::input
-                x-data="{
-                    focusInput() {
-                        this.$refs.searchInput.focus();
-                    }
-                }"
-                x-ref="searchInput"
-                x-init="
-                    $nextTick(() => focusInput());
-                    // Page ko'rinishga kelganda ham focus qilish
-                    document.addEventListener('visibilitychange', () => {
-                        if (!document.hidden) {
-                            setTimeout(() => focusInput(), 100);
-                        }
-                    });
-                "
-                x-on:keydown.enter="$wire.addByBarcode($event.target.value); $event.target.value=''; $nextTick(() => focusInput())"
-{{--                x-on:blur="setTimeout(() => focusInput(), 100)"--}}
-                wire:model.live="search"
-                placeholder="Skanerlash yoki qo'lda kiriting..."
-                autofocus
-            />
+            <x-filament::input.wrapper class="mb-4">
+                <x-slot name="prefix">
+                    <x-heroicon-o-magnifying-glass class="w-5 h-5 text-gray-400 dark:text-gray-500"/>
+                </x-slot>
+                <x-filament::input
+                    x-data="{
+                            focusInput() {
+                                this.$refs.searchInput.focus();
+                            }
+                        }"
+                    x-ref="searchInput"
+                    x-init="
+                            $nextTick(() => focusInput());
+                            document.addEventListener('visibilitychange', () => {
+                                if (!document.hidden) {
+                                    setTimeout(() => focusInput(), 100);
+                                }
+                            });
+                        "
+                    x-on:keydown.enter="$wire.addByBarcode($event.target.value); $event.target.value=''; $nextTick(() => focusInput())"
+                    wire:model.live="search"
+                    placeholder="Skanerlash yoki qo'lda kiriting..."
+                    autofocus
+                />
+            </x-filament::input.wrapper>
 
             {{-- Qidiruv natijalari --}}
             @if($products->isNotEmpty())
@@ -125,99 +135,111 @@
             @endif
         </div>
 
-        {{-- Joriy savat --}}
-        <div class="border rounded-lg p-4 bg-gray-50">
-            <div class="flex justify-between items-center mb-3">
-                <h2 class="font-semibold">Savat #{{ $activeCartId }}</h2>
-                @if($totals['qty'] > 0)
-                    <span class="text-sm text-gray-600">{{ $totals['qty'] }} dona</span>
+        {{-- Right Column: Current Cart --}}
+        <x-filament::card class="lg:sticky lg:top-6 h-fit"> {{-- Sticky for desktop --}}
+            <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-200 dark:border-gray-700">
+                <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Savat #{{ $activeCartId }}</h2>
+                @if(isset($totals['qty']) && $totals['qty'] > 0)
+                    <span class="text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-md">{{ $totals['qty'] }} mahsulot</span>
                 @endif
             </div>
 
             @if(empty($cart))
-                <div class="text-gray-500">Mahsulot yo'q</div>
+                <div class="text-center py-10 text-gray-500 dark:text-gray-400">
+                    <x-heroicon-o-shopping-cart class="w-16 h-16 mx-auto mb-3 text-gray-400 dark:text-gray-500"/>
+                    <p>Savatda hozircha mahsulot yo'q.</p>
+                    <p class="text-xs mt-1">Qidiruv maydonidan mahsulot qo'shing.</p>
+                </div>
             @else
-                <table class="w-full text-sm">
-                    <thead>
-                    <tr>
-                        <th class="text-left">Nomi</th>
-                        <th class="text-center">Miqdori</th>
-                        <th class="text-right">Narx</th>
-                        <th class="text-right">Jami</th>
-                        <th></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach($cart as $row)
+                <div class="flow-root">
+                    <table class="w-full text-sm divide-y divide-gray-200 dark:divide-gray-700"> {{-- Changed min-w-full to w-full --}}
+                        <thead class="bg-gray-50 dark:bg-gray-800">
                         <tr>
-                            <td>{{ $row['name'] }}</td>
-                            <td class="text-center">
-                                <input type="number" min="1"
-                                       x-on:change="
-                                        $wire.updateQty({{ $row['id'] }}, $event.target.value);
-                                        setTimeout(() => $refs.searchInput.focus(), 100);"
-                                       value="{{ $row['qty'] }}"
-                                       class="w-16 border rounded px-1 text-center">
-                            </td>
-                            <td class="text-right">{{ number_format($row['price'], 2) }}</td>
-                            <td class="text-right">{{ number_format($row['qty'] * $row['price'], 2) }}</td>
-                            <td class="text-right">
-                                <button wire:click="remove({{ $row['id'] }})" class="text-red-600 hover:text-red-800">×</button>
-                            </td>
+                            <th scope="col" class="w-full px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nomi</th> {{-- Added w-full --}}
+                            <th scope="col" class="px-3 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Miqdori</th>
+                            <th scope="col" class="px-3 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Narx</th>
+                            <th scope="col" class="px-3 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Jami</th>
+                            <th scope="col" class="px-3 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Amal</th>
                         </tr>
-                    @endforeach
-                    </tbody>
-                </table>
-
-                <div class="border-t mt-3 pt-3 text-right space-x-6">
-                    <span class="font-medium">Dona: {{ $totals['qty'] }}</span>
-                    <span class="font-semibold">Summa: {{ number_format($totals['amount'], 2, '.', ' ') }} so'm</span>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                        @foreach($cart as $row)
+                            <tr>
+                                <td class="w-full px-3 py-3 font-medium text-gray-900 dark:text-gray-100 whitespace-normal break-words">{{ $row['name'] }}</td> {{-- Added w-full --}}
+                                <td class="px-3 py-3 text-center">
+                                    <input type="number" min="1"
+                                           x-on:change="$wire.updateQty({{ $row['id'] }}, $event.target.value); setTimeout(() => $refs.searchInput.focus(), 100);"
+                                           value="{{ $row['qty'] }}"
+                                           class="w-20 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500 rounded-md shadow-sm text-center py-1.5 px-2 text-sm">
+                                </td>
+                                <td class="px-3 py-3 text-right text-gray-600 dark:text-gray-400 whitespace-nowrap">{{ number_format($row['price'], 0,'.',' ') }}</td>
+                                <td class="px-3 py-3 text-right font-semibold text-gray-800 dark:text-gray-200 whitespace-nowrap">{{ number_format($row['qty'] * $row['price'], 0,'.',' ') }}</td>
+                                <td class="px-3 py-3 text-center">
+                                    <button wire:click="remove({{ $row['id'] }})" class="text-danger-600 hover:text-danger-800 dark:text-danger-500 dark:hover:text-danger-400 p-1.5 rounded-md hover:bg-danger-50 dark:hover:bg-danger-900/50" title="O'chirish">
+                                        <x-heroicon-o-trash class="w-5 h-5"/>
+                                    </button>
+                                </td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
                 </div>
 
-                <x-filament::button wire:click="checkout" color="success" class="mt-4 w-full">
+                <div class="border-t border-gray-200 dark:border-gray-700 mt-4 pt-4 space-y-2">
+                    <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                        <span>Mahsulotlar soni:</span>
+                        <span class="font-medium text-gray-800 dark:text-gray-200">{{ $totals['qty'] }} dona</span>
+                    </div>
+                    <div class="flex justify-between text-lg font-semibold text-gray-900 dark:text-white">
+                        <span>Jami summa:</span>
+                        <span>{{ number_format($totals['amount'], 0, '.', ' ') }} so'm</span>
+                    </div>
+                </div>
+
+                <x-filament::button wire:click="checkout" color="success" class="mt-6 w-full" size="lg" icon="heroicon-o-check-circle">
                     Savat #{{ $activeCartId }} ni yakunlash
                 </x-filament::button>
             @endif
-        </div>
-    </div>
+        </x-filament::card>
+
 
     {{-- Barcha faol savatlar ko'rinishi (ixtiyoriy) --}}
-    @if(count($activeCarts) > 1)
-        <div class="mt-8">
-            <h3 class="font-semibold mb-4">Barcha faol savatlar:</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                @foreach($activeCarts as $cartId => $cartTotals)
-                    <div class="border rounded-lg p-3 {{ $activeCartId === $cartId ? 'bg-blue-50 border-blue-300' : 'bg-white' }}">
-                        <div class="flex justify-between items-center mb-2">
-                            <h4 class="font-medium">Savat #{{ $cartId }}</h4>
-                            @if($activeCartId === $cartId)
-                                <span class="text-blue-600 text-sm font-medium">Faol</span>
-                            @endif
-                        </div>
-                        <div class="text-sm text-gray-600">
-                            <div>Mahsulotlar: {{ $cartTotals['qty'] }} dona</div>
-                            <div>Summa: {{ number_format($cartTotals['amount'], 2, '.', ' ') }} so'm</div>
-                        </div>
-                        <div class="mt-2 flex gap-2">
-                            @if($activeCartId !== $cartId)
-                                <x-filament::button wire:click="switchCart({{ $cartId }})" size="xs">
-                                    Ochish
-                                </x-filament::button>
-                            @endif
-                            @if(count($activeCarts) > 1)
-                                <x-filament::button
-                                    wire:click="closeCart({{ $cartId }})"
-                                    size="xs"
-                                    color="danger"
-                                    wire:confirm="Savat #{{ $cartId }} ni yopishni tasdiqlaysizmi?"
-                                >
-                                    Yopish
-                                </x-filament::button>
-                            @endif
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-    @endif
+{{--    @if(count($activeCarts) > 1)--}}
+{{--        <div class="mt-8">--}}
+{{--            <h3 class="font-semibold mb-4">Barcha faol savatlar:</h3>--}}
+{{--            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">--}}
+{{--                @foreach($activeCarts as $cartId => $cartTotals)--}}
+{{--                    <div class="border rounded-lg p-3 {{ $activeCartId === $cartId ? 'bg-blue-50 border-blue-300' : 'bg-white' }}">--}}
+{{--                        <div class="flex justify-between items-center mb-2">--}}
+{{--                            <h4 class="font-medium">Savat #{{ $cartId }}</h4>--}}
+{{--                            @if($activeCartId === $cartId)--}}
+{{--                                <span class="text-blue-600 text-sm font-medium">Faol</span>--}}
+{{--                            @endif--}}
+{{--                        </div>--}}
+{{--                        <div class="text-sm text-gray-600">--}}
+{{--                            <div>Mahsulotlar: {{ $cartTotals['qty'] }} dona</div>--}}
+{{--                            <div>Summa: {{ number_format($cartTotals['amount'], 2, '.', ' ') }} so'm</div>--}}
+{{--                        </div>--}}
+{{--                        <div class="mt-2 flex gap-2">--}}
+{{--                            @if($activeCartId !== $cartId)--}}
+{{--                                <x-filament::button wire:click="switchCart({{ $cartId }})" size="xs">--}}
+{{--                                    Ochish--}}
+{{--                                </x-filament::button>--}}
+{{--                            @endif--}}
+{{--                            @if(count($activeCarts) > 1)--}}
+{{--                                <x-filament::button--}}
+{{--                                    wire:click="closeCart({{ $cartId }})"--}}
+{{--                                    size="xs"--}}
+{{--                                    color="danger"--}}
+{{--                                    wire:confirm="Savat #{{ $cartId }} ni yopishni tasdiqlaysizmi?"--}}
+{{--                                >--}}
+{{--                                    Yopish--}}
+{{--                                </x-filament::button>--}}
+{{--                            @endif--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+{{--                @endforeach--}}
+{{--            </div>--}}
+{{--        </div>--}}
+{{--    @endif--}}
 </x-filament::page>

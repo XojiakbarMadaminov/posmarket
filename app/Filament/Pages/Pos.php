@@ -3,7 +3,6 @@
 namespace App\Filament\Pages;
 
 use App\Models\Product;
-use App\Models\Sale;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Panel\Concerns\HasNotifications;
@@ -16,8 +15,15 @@ class Pos extends Page
     use HasNotifications;
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
-    protected static ?string $title          = 'Kassa (POS)';
+    protected static ?string $title          = 'Sotuv';
+    protected static ?int $navigationSort = 2;
+
     protected static string  $view           = 'filament.pages.pos';
+
+    public function getHeading(): string
+    {
+        return '';
+    }
 
     public string $search = '';
     public int $activeCartId = 1; // Joriy faol cart ID

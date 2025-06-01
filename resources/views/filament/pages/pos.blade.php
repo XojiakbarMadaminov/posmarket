@@ -185,7 +185,10 @@
                     </table>
                 </div>
 
+                {{-- === Totallar va tugmalar === --}}
                 <div class="border-t border-gray-200 dark:border-gray-700 mt-4 pt-4 space-y-2">
+
+                    {{-- Totallar --}}
                     <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400">
                         <span>Mahsulotlar soni:</span>
                         <span class="font-medium text-gray-800 dark:text-gray-200">{{ $totals['qty'] }} dona</span>
@@ -194,11 +197,33 @@
                         <span>Jami summa:</span>
                         <span>{{ number_format($totals['amount'], 0, '.', ' ') }} so'm</span>
                     </div>
-                </div>
 
-                <x-filament::button wire:click="checkout" color="success" class="mt-6 w-full" size="lg" icon="heroicon-o-check-circle">
-                    Savat #{{ $activeCartId }} ni yakunlash
-                </x-filament::button>
+                    {{-- Tugmalar satri --}}
+                    <div class="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+
+                        {{-- Chapda — yopish (kichik, qizil) --}}
+                        <x-filament::button
+                            wire:click="closeCart({{ $activeCartId }})"
+                            size="sm"
+                            color="danger"
+                            class="sm:w-auto w-full order-2 sm:order-1"
+                            wire:confirm="Savat #{{ $activeCartId }} ni yopishni tasdiqlaysizmi?"
+                        >
+                            Yopish
+                        </x-filament::button>
+
+                        {{-- O‘ngda — to‘lovni yakunlash (katta, yashil) --}}
+                        <x-filament::button
+                            wire:click="checkout"
+                            color="success"
+                            size="lg"
+                            icon="heroicon-o-check-circle"
+                            class="sm:w-auto w-full order-1 sm:order-2"
+                        >
+                            Savat #{{ $activeCartId }} ni yakunlash
+                        </x-filament::button>
+                    </div>
+                </div>
             @endif
         </x-filament::card>
 

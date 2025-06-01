@@ -7,8 +7,8 @@
 
         body {
             font-family: monospace;
-            font-size: 10px;
-            width: 136pt; /* 48mm */
+            font-size: 14px;
+            width: 176pt; /* 62mm */
             margin: 0;
             padding: 10px;
         }
@@ -25,7 +25,7 @@
         }
 
         .mini {
-            font-size: 6px;
+            font-size: 10px;
             text-align: center;
         }
     </style>

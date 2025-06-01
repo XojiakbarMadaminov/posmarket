@@ -12,6 +12,7 @@ Route::get('/', function () {
 });
 
 
+// debtor uchun
 Route::get('/debtor/{debtor}/check-pdf', function (Debtor $debtor) {
     $debtor->load('transactions');
 
@@ -20,7 +21,7 @@ Route::get('/debtor/{debtor}/check-pdf', function (Debtor $debtor) {
     $height = min(396, $base + $extra); // max 140mm
 
     return Pdf::loadView('debtor-check', compact('debtor'))
-        ->setPaper([0, 0, 136, $height], 'portrait') // 48mm × height
+        ->setPaper([0, 0, 176, $height], 'portrait')  // 62mm × height
         ->stream('check.pdf');
 })->name('debtor.check.pdf');
 

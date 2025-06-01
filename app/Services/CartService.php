@@ -6,16 +6,18 @@ use App\Models\Product;
 
 class CartService
 {
-    protected string $key = 'pos_cart';
+    protected string $key = 'pos_carts'; // Endi ko'p cart uchun
 
-    public function all(): array
+    public function all(int $cartId = 1): array
     {
-        return session($this->key, []);
+        $carts = session($this->key, []);
+        return $carts[$cartId] ?? [];
     }
 
-    public function add(Product $product, int $qty = 1): void
+    public function add(Product $product, int $qty = 1, int $cartId = 1): void
     {
-        $items = $this->all();
+        $carts = session($this->key, []);
+        $items = $carts[$cartId] ?? [];
 
         if (isset($items[$product->id])) {
             $items[$product->id]['qty'] += $qty;
@@ -28,37 +30,74 @@ class CartService
             ];
         }
 
-        session()->put($this->key, $items);
+        $carts[$cartId] = $items;
+        session()->put($this->key, $carts);
     }
 
-    public function update(int $productId, int $qty): void
+    public function update(int $productId, int $qty, int $cartId = 1): void
     {
-        $items = $this->all();
+        $carts = session($this->key, []);
+        $items = $carts[$cartId] ?? [];
+
         if (isset($items[$productId])) {
             $items[$productId]['qty'] = max(1, $qty);
-            session()->put($this->key, $items);
+            $carts[$cartId] = $items;
+            session()->put($this->key, $carts);
         }
     }
 
-    public function remove(int $productId): void
+    public function remove(int $productId, int $cartId = 1): void
     {
-        $items = $this->all();
+        $carts = session($this->key, []);
+        $items = $carts[$cartId] ?? [];
+
         unset($items[$productId]);
-        session()->put($this->key, $items);
+        $carts[$cartId] = $items;
+        session()->put($this->key, $carts);
     }
 
-    public function clear(): void
+    public function clear(int $cartId = 1): void
+    {
+        $carts = session($this->key, []);
+        unset($carts[$cartId]);
+        session()->put($this->key, $carts);
+    }
+
+    public function clearAll(): void
     {
         session()->forget($this->key);
     }
 
-    public function totals(): array
+    public function totals(int $cartId = 1): array
     {
-        $items  = $this->all();
+        $items  = $this->all($cartId);
         $qty    = array_sum(array_column($items, 'qty'));
         $amount = array_sum(array_map(fn ($i) => $i['qty'] * $i['price'], $items));
 
         return ['qty' => $qty, 'amount' => $amount];
     }
-}
 
+    public function getAllCarts(): array
+    {
+        return session($this->key, []);
+    }
+
+    public function getAllCartIds(): array
+    {
+        $carts = session($this->key, []);
+        // Barcha cartlarni qaytarish (bo'sh ham, to'la ham)
+        return array_keys($carts);
+    }
+
+    public function getActiveCartIds(): array
+    {
+        $carts = $this->getAllCarts();
+        return array_keys(array_filter($carts, fn($cart) => !empty($cart)));
+    }
+
+    public function cartExists(int $cartId): bool
+    {
+        $carts = session($this->key, []);
+        return isset($carts[$cartId]) && !empty($carts[$cartId]);
+    }
+}

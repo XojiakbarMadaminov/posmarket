@@ -29,10 +29,11 @@ Route::get('/debtor/{debtor}/check-pdf', function (Debtor $debtor) {
 // 1. Bitta product uchun
 Route::get('/products/{product}/barcode-pdf', function (Product $product) {
     return Pdf::loadView('product-barcode', ['products' => collect([$product])])
-        ->setPaper([0, 0, 136, 85.0]) // 50mm x 30mm → 1mm = 2.834pt
+        ->setPaper([0, 0, 85.0, 65.2], 'portrait') // 23mm x 30mm
         ->setOptions(['defaultFont' => 'sans-serif'])
         ->stream("barcode-{$product->id}.pdf");
 })->name('product.barcode.pdf');
+
 
 // 2. Ko‘p product uchun (masalan, tanlanganlar)
 Route::get('/products/barcodes/bulk', function () {

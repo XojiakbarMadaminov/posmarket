@@ -8,7 +8,9 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\ViewColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Milon\Barcode\DNS1D;
 
@@ -44,16 +46,16 @@ class ProductResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn (Builder $query) => $query->orderByDesc('created_at'))
             ->columns([
                 Tables\Columns\TextColumn::make('name')->label('Nomi')
                 ->searchable(),
                 Tables\Columns\TextColumn::make('barcode')->label('Bar kod')
                 ->searchable(),
                 Tables\Columns\TextColumn::make('price')->label('Narxi'),
-                Tables\Columns\TextColumn::make('barcode_image')
+                ViewColumn::make('barcode_image')
                     ->label('Bar kod')
-                    ->html(fn ($record) => DNS1D::getBarcodeHTML($record->barcode, 'EAN13', 2, 50, 'black')
-                    ),
+                    ->view('filament.components.barcode'),
             ])
             ->filters([
                 //

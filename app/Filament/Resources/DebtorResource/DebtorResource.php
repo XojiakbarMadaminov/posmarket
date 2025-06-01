@@ -22,7 +22,7 @@ class DebtorResource extends Resource
     protected static ?string $model = Debtor::class;
     protected static ?int $navigationSort = 4;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-credit-card';
 
     protected static ?string $label = 'Qarzdorlar';
 

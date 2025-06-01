@@ -43,11 +43,11 @@
 <div class="line">Ism:    {{ $debtor->full_name }}</div>
 <div class="line">Tel:    {{ $debtor->phone }}</div>
 <div class="line">Valyuta: {{ strtoupper($debtor->currency) }}</div>
-<div class="line">Joriy:  {{ number_format($debtor->amount, 0, '.', ' ') }}</div>
+<div class="line">Joriy qarz:  {{ number_format($debtor->amount, 0, '.', ' ') }}</div>
 
-@if ($debtor->note)
-    <div class="line">Izoh: {{ $debtor->note }}</div>
-@endif
+{{--@if ($debtor->note)--}}
+{{--    <div class="line">Izoh: {{ $debtor->note }}</div>--}}
+{{--@endif--}}
 
 @if ($debtor->transactions->isNotEmpty())
     <div class="divider"></div>

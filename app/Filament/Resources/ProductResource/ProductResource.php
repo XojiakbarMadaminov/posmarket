@@ -19,7 +19,7 @@ class ProductResource extends Resource
     protected static ?string $model = Product::class;
     protected static ?int $navigationSort = 3;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-building-storefront';
 
     public static function getLabel(): ?string
     {
@@ -58,8 +58,8 @@ class ProductResource extends Resource
                 ->searchable(),
                 Tables\Columns\TextColumn::make('barcode')->label('Bar kod')
                 ->searchable(),
-                Tables\Columns\TextColumn::make('price')->label('Narxi'),
                 Tables\Columns\TextColumn::make('initial_price')->label('Kelgan narxi'),
+                Tables\Columns\TextColumn::make('price')->label('Narxi'),
                 ViewColumn::make('barcode_image')
                     ->label('Bar kod')
                     ->view('filament.components.barcode'),

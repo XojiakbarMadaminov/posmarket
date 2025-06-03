@@ -2,18 +2,18 @@
 
 namespace App\Filament\Widgets;
 
+use App\Models\SaleItem;
 use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Components\DatePicker;
 use Filament\Widgets\BarChartWidget;
 use Illuminate\Support\Carbon;
-use App\Models\SaleItem;
+use Livewire\Attributes\On;
 
 class TopSellingProductsChart extends BarChartWidget
 {
     use InteractsWithForms;
 
     public ?string $start_date = null;
-    public ?string $end_date   = null;
+    public ?string $end_date = null;
 
     protected static ?string $heading = 'Top 10 sotilgan tovarlar';
 
@@ -22,29 +22,17 @@ class TopSellingProductsChart extends BarChartWidget
         return 'full';
     }
 
-    /** --------- FILTER FORM --------- */
-    protected function getFormSchema(): array
+    #[On('refreshStats')]
+    public function updateFilters($start_date, $end_date)
     {
-        return [
-            DatePicker::make('start_date')
-                ->label('Boshlanish sanasi')
-                ->default(now())
-                ->reactive()
-                ->closeOnDateSelection(),
-
-            DatePicker::make('end_date')
-                ->label('Tugash sanasi')
-                ->default(now())
-                ->reactive()
-                ->closeOnDateSelection(),
-        ];
+        $this->start_date = $start_date;
+        $this->end_date = $end_date;
     }
 
-    /** --------- CHART MA’LUMOTI --------- */
     protected function getData(): array
     {
         $start = Carbon::parse($this->start_date ?? now())->startOfDay();
-        $end   = Carbon::parse($this->end_date   ?? now())->endOfDay();
+        $end = Carbon::parse($this->end_date ?? now())->endOfDay();
 
         $topProducts = SaleItem::with('product')
             ->whereBetween('created_at', [$start, $end])
@@ -58,10 +46,10 @@ class TopSellingProductsChart extends BarChartWidget
             'datasets' => [
                 [
                     'label' => 'Sotilgan soni',
-                    'data'  => $topProducts->pluck('total_qty'),
+                    'data' => $topProducts->pluck('total_qty'),
                 ],
             ],
-            'labels'   => $topProducts->pluck('product.name')->toArray(),
+            'labels' => $topProducts->pluck('product.name')->toArray(),
         ];
     }
 }

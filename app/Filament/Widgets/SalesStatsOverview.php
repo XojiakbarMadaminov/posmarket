@@ -2,49 +2,35 @@
 
 namespace App\Filament\Widgets;
 
+use App\Models\Sale;
+use App\Models\SaleItem;
 use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Components\DatePicker;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Card;
 use Illuminate\Support\Carbon;
-use App\Models\Sale;
-use App\Models\SaleItem;
+use Livewire\Attributes\On;
 
 class SalesStatsOverview extends BaseWidget
 {
     use InteractsWithForms;
 
-    // Form mavjud bo‘lishi uchun public propertilar
     public ?string $start_date = null;
-    public ?string $end_date   = null;
+    public ?string $end_date = null;
 
-    /** --------- FILTER FORM --------- */
-    protected function getFormSchema(): array
+    #[On('refreshStats')]
+    public function updateFilters($start_date, $end_date)
     {
-        return [
-            DatePicker::make('start_date')
-                ->label('Boshlanish sanasi')
-                ->default(now())          // bugungi kun
-                ->reactive()
-                ->closeOnDateSelection(),
-
-            DatePicker::make('end_date')
-                ->label('Tugash sanasi')
-                ->default(now())
-                ->reactive()
-                ->closeOnDateSelection(),
-        ];
+        $this->start_date = $start_date;
+        $this->end_date = $end_date;
     }
 
-    /** --------- STATLAR --------- */
     protected function getCards(): array
     {
-        // Fallback: foydalanuvchi tanlamasa ham bugungi sana
         $start = Carbon::parse($this->start_date ?? now())->startOfDay();
-        $end   = Carbon::parse($this->end_date   ?? now())->endOfDay();
+        $end = Carbon::parse($this->end_date ?? now())->endOfDay();
 
-        $sales       = Sale::whereBetween('created_at', [$start, $end])->get();
-        $totalSales  = $sales->sum('total');
+        $sales = Sale::whereBetween('created_at', [$start, $end])->get();
+        $totalSales = $sales->sum('total');
 
         $totalProfit = SaleItem::whereIn('sale_items.sale_id', $sales->pluck('id'))
             ->join('products', 'products.id', '=', 'sale_items.product_id')

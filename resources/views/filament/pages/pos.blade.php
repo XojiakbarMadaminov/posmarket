@@ -164,6 +164,7 @@
                         </thead>
                         <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                         @foreach($cart as $index => $row)
+                            <tr>
                             <td class="w-full px-3 py-3 font-medium text-gray-900 dark:text-gray-100 whitespace-normal break-words">{{ $row['name'] }}</td> {{-- Added w-full --}}
                                 <td class="px-3 py-3 text-center">
                                     <input type="number" min="1"

@@ -32,7 +32,7 @@
         @if(count($activeCarts) > 0)
             <div class="flex flex-wrap gap-2 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
                 @foreach($activeCarts as $cartId => $cartTotals)
-                    <div class="relative group">
+                    <div wire:key="cart-{{ $cartId }}" class="relative group">
                         <x-filament::button
                             wire:click="switchCart({{ $cartId }})"
                             size="sm"
@@ -109,7 +109,7 @@
             {{-- Qidiruv natijalari --}}
             @if($products->isNotEmpty())
                 <table class="w-full mt-4 text-sm">
-                    <thead class="bg-gray-100">
+                    <thead class="bg-gray-100 dark:bg-gray-800">
                     <tr>
                         <th class="px-2 py-1 text-left">Barcode</th>
                         <th class="px-2 py-1 text-left">Nomi</th>
@@ -119,7 +119,7 @@
                     </thead>
                     <tbody>
                     @foreach($products as $p)
-                        <tr class="hover:bg-gray-50">
+                        <tr wire:key="item-{{ $p->id }}" class="bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-200">
                             <td class="px-2 py-1">{{ $p->barcode }}</td>
                             <td class="px-2 py-1">{{ $p->name }}</td>
                             <td class="px-2 py-1 text-right">{{ number_format($p->price, 2, '.', ' ') }}</td>
@@ -136,7 +136,7 @@
         </div>
 
         {{-- Right Column: Current Cart --}}
-        <x-filament::card class="lg:sticky lg:top-6 h-fit"> {{-- Sticky for desktop --}}
+        <x-filament::card class="lg:sticky lg:top-6 h-fit" > {{-- Sticky for desktop --}}
             <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-200 dark:border-gray-700">
                 <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Savat #{{ $activeCartId }}</h2>
                 @if(isset($totals['qty']) && $totals['qty'] > 0)
@@ -163,9 +163,8 @@
                         </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                        @foreach($cart as $row)
-                            <tr>
-                                <td class="w-full px-3 py-3 font-medium text-gray-900 dark:text-gray-100 whitespace-normal break-words">{{ $row['name'] }}</td> {{-- Added w-full --}}
+                        @foreach($cart as $index => $row)
+                            <td class="w-full px-3 py-3 font-medium text-gray-900 dark:text-gray-100 whitespace-normal break-words">{{ $row['name'] }}</td> {{-- Added w-full --}}
                                 <td class="px-3 py-3 text-center">
                                     <input type="number" min="1"
                                            x-on:change="$wire.updateQty({{ $row['id'] }}, $event.target.value); setTimeout(() => $refs.searchInput.focus(), 100);"
@@ -268,3 +267,5 @@
 {{--        </div>--}}
 {{--    @endif--}}
 </x-filament::page>
+
+

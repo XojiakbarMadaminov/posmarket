@@ -4,12 +4,14 @@ namespace App\Filament\Pages;
 
 use App\Filament\Widgets\SalesStatsOverview;
 use App\Filament\Widgets\TopSellingProductsChart;
+use App\Http\Middleware\DashboardPassword;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Form;
 use Filament\Pages\Dashboard as BaseDashboard;
 
 class Dashboard extends BaseDashboard
 {
+    public static array|string $routeMiddleware = [DashboardPassword::class];
     protected static ?string $navigationIcon = 'heroicon-o-home';
     protected static string $view = 'filament.pages.dashboard';
     public ?string $start_date = null;

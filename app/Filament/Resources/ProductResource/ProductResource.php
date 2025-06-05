@@ -45,7 +45,19 @@ class ProductResource extends Resource
                     ),
                 TextInput::make('name')->label('Nomi')->required(),
                 TextInput::make('initial_price')->label('Kelgan narxi')->numeric(),
-                TextInput::make('price')->label('Sotish narxi')->numeric()->required(),
+                TextInput::make('price')
+                    ->label('Sotish narxi')
+                    ->numeric()
+                    ->required()
+                    ->rule(function (callable $get) {
+                        $initial = $get('initial_price');
+
+                        return function (string $attribute, $value, $fail) use ($initial) {
+                            if ($initial !== null && $value <= $initial) {
+                                $fail('Sotish narxi kelgan narxidan katta bo‘lishi kerak.');
+                            }
+                        };
+                    }),
             ]);
     }
 

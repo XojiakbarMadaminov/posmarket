@@ -14,7 +14,7 @@ return [
     */
 
     'name' => env('APP_NAME', 'Laravel'),
-    'dashboard_password' => env('APP_DASHBOARD_PASSWORD', '123456789'),
+    'dashboard_password' => env('APP_DASHBOARD_PASSWORD', 'million'),
 
     /*
     |--------------------------------------------------------------------------

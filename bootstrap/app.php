@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\DashboardPassword;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -12,7 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->web([
-           'dashboard.password' => \App\Http\Middleware\Authenticate::class,
+           'dashboard.password' => DashboardPassword::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

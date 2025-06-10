@@ -163,7 +163,39 @@
                                            value="{{ $row['qty'] }}"
                                            class="w-20 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500 rounded-md shadow-sm text-center py-1.5 px-2 text-sm">
                                 </td>
-                                <td class="px-3 py-3 text-right text-gray-600 dark:text-gray-400 whitespace-nowrap">{{ number_format($row['price'], 0,'.',' ') }}</td>
+{{--                                number_format($row['price'], 0,'.',' ')--}}
+                                <td class="px-3 py-3 text-right">
+                                    <div
+                                        wire:key="price-input-{{ $activeCartId }}-{{ $row['id'] }}"
+                                        x-data="{
+                                            updatePrice(event) {
+                                                const newPrice = parseFloat(event.target.value);
+                                                $wire.updatePrice({{ $row['id'] }}, newPrice)
+                                                    .then(() => {
+                                                        // muvaffaqiyatli bo‘lsa hech nima qilmaydi
+                                                    })
+                                                    .catch(() => {
+                                                        // xato bo‘lsa, narxni defaultPrice ga qaytar
+                                                        setTimeout(() => {
+                                                            event.target.value = {{$row['price']}};
+                                                        }, 50);
+                                                    });
+                                            }
+                                        }"
+                                    >
+                                        @php
+                                            $minPrice = round($row['initial_price'] * 1.05, 2);
+                                        @endphp
+
+                                        <input type="number"
+                                               min="{{$minPrice}}" step="100"
+                                               value="{{ $row['price'] }}"
+                                               @change="updatePrice($event)"
+                                               class="w-24 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500 rounded-md shadow-sm text-right py-1.5 px-2 text-sm">
+                                    </div>
+
+                                </td>
+
                                 <td class="px-3 py-3 text-right font-semibold text-gray-800 dark:text-gray-200 whitespace-nowrap">{{ number_format($row['qty'] * $row['price'], 0,'.',' ') }}</td>
                                 <td class="px-3 py-3 text-center">
                                     <button wire:click="remove({{ $row['id'] }})" class="text-danger-600 hover:text-danger-800 dark:text-danger-500 dark:hover:text-danger-400 p-1.5 rounded-md hover:bg-danger-50 dark:hover:bg-danger-900/50" title="O'chirish">

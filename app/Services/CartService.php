@@ -27,6 +27,7 @@ class CartService
                 'name'  => $product->name,
                 'price' => $product->price,
                 'qty'   => $qty,
+                'initial_price' => $product->initial_price
             ];
         }
 
@@ -100,4 +101,28 @@ class CartService
         $carts = session($this->key, []);
         return isset($carts[$cartId]) && !empty($carts[$cartId]);
     }
+
+    public function updatePrice(int $productId, float $price, int $cartId = 1): void
+    {
+        $product = Product::find($productId);
+        if (!$product) {
+            return; // Mahsulot topilmasa hech narsa qilmaymiz
+        }
+
+        $minPrice = round($product->initial_price * 1.05, 2);
+
+        if ($price < $minPrice) {
+            throw new \InvalidArgumentException("Bu narx minimal narxdan past. Iltimos, minimal narxdan oshiring.");
+        }
+
+        $carts = session($this->key, []);
+        $items = $carts[$cartId] ?? [];
+
+        if (isset($items[$productId])) {
+            $items[$productId]['price'] = $price;
+            $carts[$cartId] = $items;
+            session()->put($this->key, $carts);
+        }
+    }
+
 }

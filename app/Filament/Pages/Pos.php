@@ -285,4 +285,25 @@ class Pos extends Page
                 ->send();
         }
     }
+
+    public function updatePrice(int $id, float $price)
+    {
+        try {
+            app(CartService::class)->updatePrice($id, $price, $this->activeCartId);
+            $this->refreshCart();
+            $this->refreshActiveCarts();
+
+            return true; // ✅ Promise resolved
+        } catch (\InvalidArgumentException $e) {
+            Notification::make()
+                ->title('Narx noto‘g‘ri')
+                ->body($e->getMessage())
+                ->danger()
+                ->send();
+
+            return false; // ❌ Promise rejected
+        }
+    }
+
+
 }

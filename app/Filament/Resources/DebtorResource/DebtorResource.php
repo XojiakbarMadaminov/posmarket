@@ -11,6 +11,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
@@ -128,21 +129,34 @@ class DebtorResource extends Resource
                 Action::make('add_payment')
                     ->label('To‘lov qilish')
                     ->color('success')
-                    ->form([
+                    ->form(fn(Debtor $record) => [
                         TextInput::make('amount')
                             ->label('To‘lov summasi')
-                            ->prefix(fn(Debtor $record) => $record->currency)
+                            ->prefix($record->currency)
                             ->numeric()
-                            ->required(),
+                            ->required()
+                            ->rule('lte:' . $record->amount) // `amount` dan katta bo‘lmasin
+                            ->helperText('Maksimum: ' . $record->amount . ' ' . $record->currency),
+
                         DatePicker::make('date')
                             ->label('To‘lov sanasi')
                             ->default(today())
                             ->required(),
+
                         Textarea::make('note')
                             ->label('Izoh')
                             ->nullable(),
                     ])
                     ->action(function (array $data, Debtor $record) {
+                        if ($data['amount'] > $record->amount) {
+                            Notification::make()
+                                ->title('To‘lov summasi mavjud qarzdan katta bo‘lishi mumkin emas')
+                                ->danger()
+                                ->send();
+
+                            return;
+                        }
+
                         $record->transactions()->create([
                             'type' => 'payment',
                             'amount' => $data['amount'],
@@ -150,7 +164,7 @@ class DebtorResource extends Resource
                             'note' => $data['note'] ?? null,
                         ]);
 
-                        $record->decrement('amount', $data['amount']); // qarz kamayadi
+                        $record->decrement('amount', $data['amount']);
                     }),
                 Action::make('view_pdf')
                     ->label('PDF')

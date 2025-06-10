@@ -8,7 +8,9 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Columns\ViewColumn;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -77,7 +79,7 @@ class ProductResource extends Resource
                     ->view('filament.components.barcode'),
             ])
             ->filters([
-                //
+                TrashedFilter::make(),
             ])
             ->actions([
 
@@ -89,6 +91,7 @@ class ProductResource extends Resource
 
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
+                RestoreAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -144,6 +147,13 @@ class ProductResource extends Resource
 
         return $code . $checksum;
     }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withTrashed(); // barcha ko‘rinadi
+    }
+
+
 
 
 }

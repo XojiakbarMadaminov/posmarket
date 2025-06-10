@@ -34,7 +34,7 @@ class TopSellingProductsChart extends BarChartWidget
         $start = Carbon::parse($this->start_date ?? now())->startOfDay();
         $end = Carbon::parse($this->end_date ?? now())->endOfDay();
 
-        $topProducts = SaleItem::with('product')
+        $topProducts = SaleItem::with(['product' => fn ($query) => $query->withTrashed()])
             ->whereBetween('created_at', [$start, $end])
             ->selectRaw('product_id, SUM(qty) as total_qty')
             ->groupBy('product_id')
@@ -49,7 +49,8 @@ class TopSellingProductsChart extends BarChartWidget
                     'data' => $topProducts->pluck('total_qty'),
                 ],
             ],
-            'labels' => $topProducts->pluck('product.name')->toArray(),
+            'labels' => $topProducts->map(fn ($item) => $item->product->name ?? 'Nomaʼlum')->toArray(),
         ];
     }
+
 }

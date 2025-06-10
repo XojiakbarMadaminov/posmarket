@@ -11,13 +11,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::view('/admin/dashboard-unlock', 'filament.components.auth')
-    ->name('dashboard.unlock')
-    ->middleware('web'); // Session ishlashi uchun
-Route::post('/admin/dashboard-unlock', fn () => null)
-    ->name('dashboard.unlock')
-    ->middleware('web', 'dashboard.password');
-
 
 // debtor uchun
 Route::get('/debtor/{debtor}/check-pdf', function (Debtor $debtor) {

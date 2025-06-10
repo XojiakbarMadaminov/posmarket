@@ -13,7 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->web([
-           'dashboard.password' => DashboardPassword::class,
+//           'dashboard.password' => DashboardPassword::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

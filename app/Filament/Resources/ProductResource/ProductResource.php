@@ -35,6 +35,7 @@ class ProductResource extends Resource
                 TextInput::make('barcode')
                     ->label('Bar kod')
                     ->unique('products', 'barcode', ignoreRecord: true)
+                    ->numeric()
                     ->required()
                     ->autofocus()
                     ->suffixAction(
@@ -74,9 +75,9 @@ class ProductResource extends Resource
                 ->searchable(),
                 Tables\Columns\TextColumn::make('initial_price')->label('Kelgan narxi'),
                 Tables\Columns\TextColumn::make('price')->label('Narxi'),
-                ViewColumn::make('barcode_image')
-                    ->label('Bar kod')
-                    ->view('filament.components.barcode'),
+//                ViewColumn::make('barcode_image')
+//                    ->label('Bar kod')
+//                    ->view('filament.components.barcode'),
             ])
             ->filters([
                 TrashedFilter::make(),

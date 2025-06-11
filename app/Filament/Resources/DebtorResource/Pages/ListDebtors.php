@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\DebtorResource\Pages;
 
 use App\Filament\Resources\DebtorResource\DebtorResource;
+use App\Filament\Widgets\DebtorStatsOverview;
 use App\Models\Debtor;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
@@ -17,6 +18,13 @@ class ListDebtors extends ListRecords
     {
         return [
             Actions\CreateAction::make(),
+        ];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            DebtorStatsOverview::class,
         ];
     }
 

@@ -33,7 +33,7 @@
 <body>
 
 <div class="center">
-    <img src="{{ public_path('images/million-50 (1).png') }}" class="logo">
+    <img src="{{ public_path('images/million_black_white_transparent.png') }}" alt="Million Parfume" class="logo">
 </div>
 
 <div class="center">*** QARZDORLIK CHEKI ***</div>

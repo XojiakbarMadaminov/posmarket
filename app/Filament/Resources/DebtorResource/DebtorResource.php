@@ -92,6 +92,7 @@ class DebtorResource extends Resource
                 TextColumn::make('currency')
                     ->label('Valyuta'),
                 TextColumn::make('date')
+                    ->sortable()
                     ->label('Sana')
             ])
             ->filters([

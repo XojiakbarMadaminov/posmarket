@@ -159,6 +159,7 @@
                             <td class="w-full px-3 py-3 font-medium text-gray-900 dark:text-gray-100 whitespace-normal break-words">{{ $row['name'] }}</td> {{-- Added w-full --}}
                                 <td class="px-3 py-3 text-center">
                                     <input type="number" min="1"
+                                           wire:key="qty-input-{{ $activeCartId }}-{{ $row['id'] }}"
                                            x-on:change="$wire.updateQty({{ $row['id'] }}, $event.target.value);"
                                            value="{{ $row['qty'] }}"
                                            class="w-20 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500 rounded-md shadow-sm text-center py-1.5 px-2 text-sm">

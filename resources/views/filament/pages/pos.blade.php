@@ -18,12 +18,115 @@
                 }
             }, 100);
         });
+
+        // Chek chiqarish
+        document.addEventListener('print-receipt', function() {
+            const printContent = document.getElementById('receipt-content');
+            if (printContent) {
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
+                    <html>
+                        <head>
+                            <title>Chek</title>
+                            <style>
+                                body { font-family: 'Courier New', monospace; font-size: 12px; margin: 0; padding: 10px; }
+                                .receipt { width: 300px; margin: 0 auto; }
+                                .center { text-align: center; }
+                                .right { text-align: right; }
+                                .line { border-bottom: 1px dashed #000; margin: 5px 0; }
+                                .bold { font-weight: bold; }
+                                .item-row { display: flex; justify-content: space-between; margin: 2px 0; }
+                                .item-name { flex: 1; }
+                                .item-price { text-align: right; }
+                                @media print {
+                                    body { margin: 0; padding: 5px; }
+                                    .receipt { width: 100%; }
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            ${printContent.innerHTML}
+                        </body>
+                    </html>
+                `);
+                printWindow.document.close();
+                printWindow.print();
+                printWindow.close();
+            }
+        });
     </script>
+
+    {{-- Receipt Modal --}}
+    @if($showReceipt)
+        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" wire:click="closeReceipt">
+            <div class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto" wire:click.stop>
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Savat Cheki</h3>
+                    <button wire:click="closeReceipt" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                        <x-heroicon-o-x-mark class="w-6 h-6"/>
+                    </button>
+                </div>
+
+                <div id="receipt-content" class="receipt-content">
+                    <div class="text-center mb-4">
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">SAVDO CHEKI</h2>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ $receiptData['receipt_number'] ?? '' }}</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ $receiptData['date'] ?? '' }}</p>
+                    </div>
+
+                    <div class="border-t border-b border-gray-200 dark:border-gray-600 py-3 mb-4">
+                        <div class="text-sm text-gray-600 dark:text-gray-400 mb-2">Savat: #{{ $receiptData['cart_id'] ?? '' }}</div>
+
+                        @if(isset($receiptData['items']))
+                            @foreach($receiptData['items'] as $item)
+                                <div class="flex justify-between items-start py-1 text-sm">
+                                    <div class="flex-1 pr-2">
+                                        <div class="font-medium text-gray-900 dark:text-white">{{ $item['name'] }}</div>
+                                        <div class="text-gray-500 dark:text-gray-400">
+                                            {{ $item['qty'] }} x {{ number_format($item['price'], 0, '.', ' ') }}
+                                        </div>
+                                    </div>
+                                    <div class="text-right font-medium text-gray-900 dark:text-white">
+                                        {{ number_format($item['qty'] * $item['price'], 0, '.', ' ') }} so'm
+                                    </div>
+                                </div>
+                            @endforeach
+                        @endif
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                            <span>Jami mahsulotlar:</span>
+                            <span>{{ $receiptData['totals']['qty'] ?? 0 }} dona</span>
+                        </div>
+                        <div class="flex justify-between text-lg font-bold text-gray-900 dark:text-white border-t pt-2">
+                            <span>JAMI SUMMA:</span>
+                            <span>{{ number_format($receiptData['totals']['amount'] ?? 0, 0, '.', ' ') }} so'm</span>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Xaridingiz uchun rahmat!</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Yana tashrifingizni kutamiz</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 mt-6">
+                    <button wire:click="printReceipt" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium">
+                        <x-heroicon-o-printer class="w-5 h-5 inline mr-2"/>
+                        Chop etish
+                    </button>
+                    <button wire:click="closeReceipt" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg font-medium">
+                        Yopish
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
 
     {{-- Cart Management Section --}}
     <x-filament::card class="mb-6" wire:key="cart-header-{{ $activeCartId }}-{{ $totals['qty'] }}">
-
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4">
             <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-3 sm:mb-0">Faol savatlar</h3>
             <x-filament::button wire:click="createNewCart" size="md" color="success" icon="heroicon-o-plus-circle">
                 Yangi savat
@@ -66,10 +169,10 @@
         </div>
     </x-filament::card>
 
-    {{-- Asosiy content --}}
+    {{-- Main content --}}
     <div class="space-y-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:space-y-0">
         <div>
-            {{-- Qidiruv input --}}
+            {{-- Search input --}}
             <x-filament::input.wrapper class="mb-4">
                 <x-slot name="prefix">
                     <x-heroicon-o-magnifying-glass class="w-5 h-5 text-gray-400 dark:text-gray-500"/>
@@ -77,19 +180,19 @@
                 <x-filament::input
                     name="search"
                     x-data="{
-                            focusInput() {
-                                this.$refs.searchInput.focus();
-                            }
-                        }"
+                        focusInput() {
+                            this.$refs.searchInput.focus();
+                        }
+                    }"
                     x-ref="searchInput"
                     x-init="
-                            $nextTick(() => focusInput());
-                            document.addEventListener('visibilitychange', () => {
-                                if (!document.hidden) {
-                                    setTimeout(() => focusInput(), 100);
-                                }
-                            });
-                        "
+                        $nextTick(() => focusInput());
+                        document.addEventListener('visibilitychange', () => {
+                            if (!document.hidden) {
+                                setTimeout(() => focusInput(), 100);
+                            }
+                        });
+                    "
                     x-on:keydown.enter="$wire.addByBarcode($event.target.value); $event.target.value=''; $nextTick(() => focusInput())"
                     wire:model.live="search"
                     placeholder="Skanerlash yoki qo'lda kiriting..."
@@ -97,7 +200,7 @@
                 />
             </x-filament::input.wrapper>
 
-            {{-- Qidiruv natijalari --}}
+            {{-- Search results --}}
             @if($products->isNotEmpty())
                 <table class="w-full mt-4 text-sm">
                     <thead class="bg-gray-100 dark:bg-gray-800">
@@ -127,7 +230,7 @@
         </div>
 
         {{-- Right Column: Current Cart --}}
-        <x-filament::card class="lg:sticky lg:top-6 h-fit" > {{-- Sticky for desktop --}}
+        <x-filament::card class="lg:sticky lg:top-6 h-fit">
             <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-200 dark:border-gray-700">
                 <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Savat #{{ $activeCartId }}</h2>
                 @if(isset($totals['qty']) && $totals['qty'] > 0)
@@ -143,10 +246,10 @@
                 </div>
             @else
                 <div class="flow-root">
-                    <table class="w-full text-sm divide-y divide-gray-200 dark:divide-gray-700"> {{-- Changed min-w-full to w-full --}}
+                    <table class="w-full text-sm divide-y divide-gray-200 dark:divide-gray-700">
                         <thead class="bg-gray-50 dark:bg-gray-800">
                         <tr>
-                            <th scope="col" class="w-full px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nomi</th> {{-- Added w-full --}}
+                            <th scope="col" class="w-full px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nomi</th>
                             <th scope="col" class="px-3 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Miqdori</th>
                             <th scope="col" class="px-3 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Narx</th>
                             <th scope="col" class="px-3 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Jami</th>
@@ -156,14 +259,13 @@
                         <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                         @foreach($cart as $index => $row)
                             <tr>
-                            <td class="w-full px-3 py-3 font-medium text-gray-900 dark:text-gray-100 whitespace-normal break-words">{{ $row['name'] }}</td> {{-- Added w-full --}}
+                                <td class="w-full px-3 py-3 font-medium text-gray-900 dark:text-gray-100 whitespace-normal break-words">{{ $row['name'] }}</td>
                                 <td class="px-3 py-3 text-center">
                                     <input type="number" min="1"
                                            x-on:change="$wire.updateQty({{ $row['id'] }}, $event.target.value);"
                                            value="{{ $row['qty'] }}"
                                            class="w-20 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500 rounded-md shadow-sm text-center py-1.5 px-2 text-sm">
                                 </td>
-{{--                                number_format($row['price'], 0,'.',' ')--}}
                                 <td class="px-3 py-3 text-right">
                                     <div
                                         wire:key="price-input-{{ $activeCartId }}-{{ $row['id'] }}"
@@ -172,10 +274,9 @@
                                                 const newPrice = parseFloat(event.target.value);
                                                 $wire.updatePrice({{ $row['id'] }}, newPrice)
                                                     .then(() => {
-                                                        // muvaffaqiyatli bo‘lsa hech nima qilmaydi
+                                                        // muvaffaqiyatli
                                                     })
                                                     .catch(() => {
-                                                        // xato bo‘lsa, narxni defaultPrice ga qaytar
                                                         setTimeout(() => {
                                                             event.target.value = {{$row['price']}};
                                                         }, 50);
@@ -193,9 +294,7 @@
                                                @change="updatePrice($event)"
                                                class="w-24 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500 rounded-md shadow-sm text-right py-1.5 px-2 text-sm">
                                     </div>
-
                                 </td>
-
                                 <td class="px-3 py-3 text-right font-semibold text-gray-800 dark:text-gray-200 whitespace-nowrap">{{ number_format($row['qty'] * $row['price'], 0,'.',' ') }}</td>
                                 <td class="px-3 py-3 text-center">
                                     <button wire:click="remove({{ $row['id'] }})" class="text-danger-600 hover:text-danger-800 dark:text-danger-500 dark:hover:text-danger-400 p-1.5 rounded-md hover:bg-danger-50 dark:hover:bg-danger-900/50" title="O'chirish">

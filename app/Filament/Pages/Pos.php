@@ -27,6 +27,8 @@ class Pos extends Page
 
     public string $search = '';
     public int $activeCartId = 1; // Joriy faol cart ID
+    public bool $showReceipt = false; // Chek ko'rsatish uchun
+    public array $receiptData = []; // Chek ma'lumotlari
 
     /** @var EloquentCollection<int, \App\Models\Product> */
     public EloquentCollection $products;
@@ -181,6 +183,10 @@ class Pos extends Page
             return;
         }
 
+        // Chek tayyorlash
+        $cartItems = $cartService->all($this->activeCartId);
+        $this->prepareReceipt($this->activeCartId, $cartItems, $totals);
+
         \DB::transaction(function () use ($cartService, $totals) {
             $sale = \App\Models\Sale::create(['total' => $totals['amount']]);
 
@@ -206,6 +212,31 @@ class Pos extends Page
             ->title("Savat #{$this->activeCartId} da sotuv yakunlandi")
             ->success()
             ->send();
+    }
+
+    /* ---------- Chek funksiyalari ---------- */
+    public function prepareReceipt(int $cartId, array $items, array $totals): void
+    {
+        $this->receiptData = [
+            'cart_id' => $cartId,
+            'items' => $items,
+            'totals' => $totals,
+            'date' => now()->format('d.m.Y H:i:s'),
+            'receipt_number' => 'R' . str_pad($cartId, 4, '0', STR_PAD_LEFT) . time(),
+        ];
+
+        $this->showReceipt = true;
+    }
+
+    public function printReceipt(): void
+    {
+        $this->dispatch('print-receipt');
+    }
+
+    public function closeReceipt(): void
+    {
+        $this->showReceipt = false;
+        $this->receiptData = [];
     }
 
     /* ---------- Helper metodlar ---------- */

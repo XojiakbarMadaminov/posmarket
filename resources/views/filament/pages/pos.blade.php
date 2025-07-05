@@ -54,6 +54,9 @@
                         Xaridingiz uchun rahmat!<br>
                         Yana tashrifingizni kutamiz
                     </div>
+                    <div class="receipt-footer-printonly">
+                        <img src="{{ asset('images/qr.png') }}" alt="QR code" style="max-width:32mm; max-height:32mm;">
+                    </div>
                 </div>
 
 
@@ -66,6 +69,7 @@
                         Yopish
                     </button>
                 </div>
+
             </div>
         </div>
     @endif

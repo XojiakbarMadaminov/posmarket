@@ -28,48 +28,39 @@ document.addEventListener('print-receipt', () => {
         <head>
             <title>Chek</title>
             <style>
-                /* 1️⃣  Lenta o‘lchami */
                 @page { size: 80mm auto; margin: 0 }
-
-                /* 2️⃣  Umumiy sozlamalar */
-                body{
+                body {
                     font-family: 'Courier New', monospace;
-                    font-size: 12px;           /* asosiy shrift */
+                    font-size: 12px;
                     margin: 0;
-                    padding: 2mm;              /* chekka 2 mm */
-                    background:#fff;
+                    padding: 0;
+                    background: #fff;
                 }
-
-                /* 3️⃣  Chek konteyneri */
-                .receipt{
-                    width: 76mm;               /* qog‘oz eni ≈ 80 mm–4 mm */
-                    margin:0 auto;
-                    page-break-inside:avoid;
+                .receipt {
+                    width: 76mm;
+                    margin: 0 auto;
+                    padding-left: 2mm;
+                    padding-right: 2mm;
+                    page-break-inside: avoid;
                 }
-
-                .center{ text-align:center }
-                .right{ text-align:right }
-                .bold{ font-weight:700 }
-
-                /* 4️⃣  Pozitsiyalar */
-                .item-row{
-                    display:flex;
-                    justify-content:space-between;
-                    align-items:flex-end;
-                    margin:1mm 0;
-                    page-break-inside:avoid;
+                .center { text-align: center }
+                .right { text-align: right }
+                .bold { font-weight: 700 }
+                .item-row {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: flex-end;
+                    margin: 1mm 0;
+                    page-break-inside: avoid;
                 }
-                .item-name{ flex:1 }
-                .item-total{ text-align:right; min-width:24mm } /* taxm. 80 px */
-
-                .line{ border-bottom:1px dashed #000; margin:2mm 0 }
-
-                /* 5️⃣  Logo */
-                .receipt img{
-                    display:block;
-                    margin:0 auto 2mm auto;
-                    max-width:40mm;            /* 40 × 40 mm dan oshmasin */
-                    max-height:40mm;
+                .item-name { flex: 1 }
+                .item-total { text-align: right; min-width: 24mm }
+                .line { border-bottom: 1px dashed #000; margin: 2mm 0 }
+                .receipt img {
+                    display: block;
+                    margin: 0 auto 2mm auto;
+                    max-width: 40mm;
+                    max-height: 40mm;
                 }
             </style>
         </head>
@@ -81,6 +72,7 @@ document.addEventListener('print-receipt', () => {
         </html>
     `);
     w.document.close();
-    setTimeout(()=>{ w.print(); w.close(); },200);
+    setTimeout(() => { w.print(); w.close(); }, 200);
 });
+
 

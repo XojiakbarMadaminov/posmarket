@@ -7,7 +7,7 @@
     @if($showReceipt)
         <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div
-                class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto"
+                class="bg-white text-black dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto"
                 style="max-height:90vh;"
                 wire:click.stop
             >
@@ -61,11 +61,11 @@
 
 
                 <div class="flex gap-3 mt-6">
-                    <button wire:click="printReceipt" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium">
+                    <button wire:click="printReceipt" class="flex-1 bg-blue-600 hover:bg-blue-700 text-blue py-2 px-4 rounded-lg font-medium">
                         <x-heroicon-o-printer class="w-5 h-5 inline mr-2"/>
                         Chop etish
                     </button>
-                    <button wire:click="closeReceipt" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg font-medium">
+                    <button wire:click="closeReceipt" class="flex-1 bg-gray-600 hover:bg-gray-700 text-blue py-2 px-4 rounded-lg font-medium">
                         Yopish
                     </button>
                 </div>

@@ -29,7 +29,7 @@ document.addEventListener('print-receipt', () => {
             <title>Chek</title>
             <style>
                 @page { size: 80mm auto; margin: 0 }
-                body {
+               body {
                     font-family: 'Courier New', monospace;
                     font-size: 12px;
                     margin: 0;

@@ -5,9 +5,13 @@
 
     {{-- Receipt Modal --}}
     @if($showReceipt)
-        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" wire:click="closeReceipt">
-            <div class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto" wire:click.stop>
-                <div class="flex justify-between items-center mb-4">
+        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div
+                class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto"
+                style="max-height:90vh;"
+                wire:click.stop
+            >
+            <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Savat Cheki</h3>
                     <button wire:click="closeReceipt" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                         <x-heroicon-o-x-mark class="w-6 h-6"/>
@@ -15,48 +19,43 @@
                 </div>
 
                 <div id="receipt-content" class="receipt-content">
-                    <div class="text-center mb-4">
-                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">SAVDO CHEKI</h2>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ $receiptData['receipt_number'] ?? '' }}</p>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ $receiptData['date'] ?? '' }}</p>
+                    <div class="center" style="margin-bottom:10px;">
+                        <img src="{{ asset('images/million_black_white_transparent.png') }}" alt="Logo" style="height:50px;">
                     </div>
+                    <div class="center bold" style="font-size:18px; margin-bottom:6px;">SAVDO CHEKI</div>
+                    <div style="text-align:center; margin-bottom:4px;">{{ $receiptData['receipt_number'] ?? '' }}</div>
+                    <div style="text-align:center; margin-bottom:8px;">{{ $receiptData['date'] ?? '' }}</div>
 
-                    <div class="border-t border-b border-gray-200 dark:border-gray-600 py-3 mb-4">
-                        <div class="text-sm text-gray-600 dark:text-gray-400 mb-2">Savat: #{{ $receiptData['cart_id'] ?? '' }}</div>
+                    <div>Savat: #{{ $receiptData['cart_id'] ?? '' }}</div>
+                    <div class="line"></div>
 
-                        @if(isset($receiptData['items']))
-                            @foreach($receiptData['items'] as $item)
-                                <div class="flex justify-between items-start py-1 text-sm">
-                                    <div class="flex-1 pr-2">
-                                        <div class="font-medium text-gray-900 dark:text-white">{{ $item['name'] }}</div>
-                                        <div class="text-gray-500 dark:text-gray-400">
-                                            {{ $item['qty'] }} x {{ number_format($item['price'], 0, '.', ' ') }}
-                                        </div>
-                                    </div>
-                                    <div class="text-right font-medium text-gray-900 dark:text-white">
-                                        {{ number_format($item['qty'] * $item['price'], 0, '.', ' ') }} so'm
-                                    </div>
-                                </div>
-                            @endforeach
-                        @endif
+                    @if(isset($receiptData['items']))
+                        @foreach($receiptData['items'] as $item)
+                            <div class="item-row">
+                <span class="item-name">
+                    {{ $item['name'] }}<br>
+                    <span style="font-size:11px;">{{ $item['qty'] }} x {{ number_format($item['price'], 0, '.', ' ') }}</span>
+                </span>
+                                <span class="item-total bold">{{ number_format($item['qty'] * $item['price'], 0, '.', ' ') }} so'm</span>
+                            </div>
+                        @endforeach
+                    @endif
+
+                    <div class="line"></div>
+                    <div class="item-row">
+                        <span>Jami mahsulotlar:</span>
+                        <span>{{ $receiptData['totals']['qty'] ?? 0 }} dona</span>
                     </div>
-
-                    <div class="space-y-2">
-                        <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400">
-                            <span>Jami mahsulotlar:</span>
-                            <span>{{ $receiptData['totals']['qty'] ?? 0 }} dona</span>
-                        </div>
-                        <div class="flex justify-between text-lg font-bold text-gray-900 dark:text-white border-t pt-2">
-                            <span>JAMI SUMMA:</span>
-                            <span>{{ number_format($receiptData['totals']['amount'] ?? 0, 0, '.', ' ') }} so'm</span>
-                        </div>
+                    <div class="item-row bold" style="font-size:15px;">
+                        <span>JAMI SUMMA:</span>
+                        <span>{{ number_format($receiptData['totals']['amount'] ?? 0, 0, '.', ' ') }} so'm</span>
                     </div>
-
-                    <div class="text-center mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Xaridingiz uchun rahmat!</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Yana tashrifingizni kutamiz</p>
+                    <div class="center" style="margin-top:18px; font-size:12px;">
+                        Xaridingiz uchun rahmat!<br>
+                        Yana tashrifingizni kutamiz
                     </div>
                 </div>
+
 
                 <div class="flex gap-3 mt-6">
                     <button wire:click="printReceipt" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium">
